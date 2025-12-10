@@ -1,0 +1,87 @@
+Build llama-cpp from source with CUDA in WSL (W11) and Flash Attention
+
+What we'll be using:
+-> NVIDIA Driver v581.80
+-> CUDA v13.0.2
+-> WSL v2.6.2
+-> Ubuntu v24.04
+-> Python v3.14
+-> flash-attention v2.8.3
+-> llama-cpp b7285
+
+
+W11 pre-requisites:
+-> Run Windows Update before anything -> restart PC if needed
+-> Latest NVIDIA driver -> restart PC if your driver was updated
+
+
+Stage:
+
+A)
+-> Install WSL
+-> Install Ubuntu distro
+1. Start menu -> turn windows features on or off -> enable: Virtual Machine Platform; Windows Subsystem for Linux -> restart PC
+2. Start menu -> Powershell (run as admin) -> "wsl --update" (in case it updates, restart pc and open PS again [admin]) -> "wsl --install Ubuntu-24.04" -> set a username and pass -> "exit" -> restart PC
+3. Start menu -> WSL Settings -> Set "Memory Size" to be the same as your RAM (mine is 16GB, so 16 x 1024 = 16384MB) -> Close "WSL Settings" window
+4. Open WSL Settings again -> confirm your Memory Size was automatically changed to a slightly lower value (if it didn't, restart PC again, mine has changed to 16099MB but can vary per system)
+5. Make sure "Swap Size" is set to (equal or higher than) 8192MB
+6. Run PS again as admin, run "wsl --shutdown"
+
+
+B)
+-> Disable WSL IPv6 support
+-> Tune Linux swappiness
+-> Install apt-fast
+
+1. Start menu -> Command Prompt (to monitor C:)
+2. 'while ($true) { Clear-Host; Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" | Select-Object DeviceID, VolumeName, @{Name='FreeSpace (GB)'; Expression={$_.FreeSpace / 1GB -as [int]}}, @{Name='Size (GB)'; Expression={$_.Size / 1GB -as [int]}}; Start-Sleep -Seconds 1 }'
+3. Launch Ubuntu 24.04 (to monitor RAM/swap)
+4. 'watch -d -n 1 "free -h | awk '{print \$1, \$2, \$3, \$4}' | column -t"'
+5. Launch Ubuntu 24.04 (to install and run lcpp)
+6. "sudo nano -w /etc/sysctl.conf"
+7. Add these lines:
+-----
+# Disable IPv6
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.lo.disable_ipv6=1
+-----
+8. Save and exit ("Ctrl+X" -> "Y" -> Enter key)
+[ 1min ]
+9. 'sudo sysctl -p && sudo sysctl vm.swappiness=1 && echo "vm.swappiness=1" | sudo tee -a /etc/sysctl.conf && sudo apt install software-properties-common -y && sudo add-apt-repository ppa:deadsnakes/ppa -y && sudo add-apt-repository ppa:apt-fast/stable -y && sudo apt update && sudo apt upgrade -y && sudo apt-get install -y debconf-utils && echo "apt-fast apt-fast/aptmanager string apt" | sudo debconf-set-selections && echo "apt-fast apt-fast/maxdownloads string 11" | sudo debconf-set-selections && echo "apt-fast apt-fast/dlflag boolean true" | sudo debconf-set-selections && sudo apt install aria2 -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install apt-fast -y'
+
+
+C)
+-> Install pre-requisites for WSL and CUDA Toolkit
+-> Install CUDA Toolkit
+-> Create Python env
+-> Install Flash Attention from wheel
+-> Build llama.cpp with Flash Attention
+
+[ 20min -> Build, install and download a model ]
+1. 'sudo apt-fast install build-essential cmake ccache ninja-build libcurl4-openssl-dev git libgomp1 python3.14-full python3.14-dev python3.14-venv -y && sudo apt-key del 7fa2af80 && wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-keyring_1.1-1_all.deb && sudo dpkg -i cuda-keyring_1.1-1_all.deb && rm -rf *.deb && sudo apt update && sudo apt-fast upgrade && sudo apt-fast install cuda-toolkit-13-0 -y && echo 'export PATH=/usr/local/cuda-13.0/bin:$PATH' >> ~/.bashrc && echo 'export LD_LIBRARY_PATH=/usr/local/cuda-13.0/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc && source ~/.bashrc && sudo apt -s autoremove -y && nvidia-smi && nvcc --version && mkdir lcpp && cd lcpp && python3.14 -m venv env && source env/bin/activate && python -m pip install pip --upgrade && python --version && python -m pip install wheel setuptools ninja packaging --upgrade && pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130 && wget https://github.com/Highlyhotgames/fast-lcpp-cuda-fa/raw/main/flash_attn_wheels/flash_attn-2.8.3-cp314-cp314-linux_x86_64.whl && nvidia-smi --query-gpu=compute_cap && sudo mkdir -p /usr/local/bin /usr/local/lib/lcpp /usr/local/share/lcpp && pip install flash_attn-2.8.3-cp314-cp314-linux_x86_64.whl && python -c "import flash_attn; print(flash_attn.__version__)" && python -c "import torch; print(torch.cuda.is_available())" && git clone https://github.com/ggerganov/llama.cpp && sudo apt update && cd llama.cpp && GGML_CUDA_ENABLE_UNIFIED_MEMORY=1 GGML_CUDA_FA_ALL_QUANTS=1 cmake -B build -DGGML_CUDA=ON -DGGML_FLASH_ATTN=ON -DCMAKE_CUDA_ARCHITECTURES=75 -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release -j$(nproc) && cmake --install build --prefix dist --strip && source ~/.bashrc && cd .. && sudo apt update && ./llama.cpp/build/bin/llama-cli --version && curl -LsSf https://hf.co/cli/install.sh | bash && echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc && source ~/.bashrc && mkdir -p models && hf download --local-dir models --max-workers 11 unsloth/Qwen3-1.7B-GGUF Qwen3-1.7B-UD-Q8_K_XL.gguf && rm -rf env && rm -rf flash_attn-2.8.3-cp314-cp314-linux_x86_64.whl && sudo mv ~/lcpp/llama.cpp/build/bin/lib*.so* /usr/local/lib/lcpp && echo "/usr/local/lib/lcpp" | sudo tee /etc/ld.so.conf.d/lcpp.conf && sudo mv ~/lcpp/llama.cpp/build/bin/* /usr/local/bin/ && sudo ldconfig && /usr/local/bin/llama-cli --version && cd llama.cpp &&  && cd examples && mv *.py *.sh *.vim ../ && cd .. && rm -rf CM* M* build cmake ggml tools tests src build-xcframework.sh scripts/xxd.cmake pocs media include examples common benches && sudo mv * /usr/local/share/lcpp && echo 'export LLAMA_DATA_PATH=/usr/local/share/lcpp' | sudo tee /etc/profile.d/lcpp.sh && sudo chmod +x /etc/profile.d/lcpp.sh && source /etc/profile.d/lcpp.sh && cd .. && rm -rf llama.cpp && sudo rm -rf /var/lib/apt/lists/* && rm -rf ~/.cache && sudo journalctl --vacuum-size=0.1M && sudo apt-mark manual cuda-toolkit-13-0 cuda-crt-13-0 cuda-cudart-13-0 cuda-cccl-13-0 cuda-libraries-13-0 libcublas-13-0 libcusparse-13-0 libcusolver-13-0 libcurand-13-0 libcufft-13-0 libnpp-13-0 libnvjpeg-13-0 libnvjitlink-13-0 libnvvm-13-0 libcufile-13-0 cuda-nvrtc-13-0 cuda-toolkit-config-common && sudo apt purge -y cmake ninja-build python3.14-full python3.14-dev python3.14-venv && rm -rf ~/.cache/* && rm -rf ~/.local/share/cuda && sudo apt purge -y nsight-systems-2025.3.2 nsight-compute-2025.3.1 && sudo apt -s autoremove && sudo apt autoremove -y && sudo apt autoclean && sudo apt clean'
+
+[ Download another model ]
+1. 'hf download --local-dir models --max-workers 8 unsloth/GLM-4.1V-9B-Thinking-GGUF GLM-4.1V-9B-Thinking-UD-Q6_K_XL.gguf'
+
+[ Run llama.cpp ]
+1. 'llama-cli -m ~/lcpp/models/Qwen3-1.7B-UD-Q8_K_XL.gguf -p "Hello! Tell me about yourself." -n 100 -no-cnv --gpu-layers 99 --flash-attn on'
+
+---------
+
+[ Instructions wsl image ]
+
+[Export]
+1. mkdir C:\backups
+2. wsl -t "Ubuntu-24.04"
+3. wsl --shutdown
+4. wsl --export "Ubuntu-24.04" C:\backups\lcpp-minimal.tar
+
+[Import]
+1. mkdir C:\WSL\lcpp
+2. wsl --import "lcpp-minimal" C:\WSL\lcpp C:\backups\lcpp-clean.tar --version 2
+
+
+END
+
+
