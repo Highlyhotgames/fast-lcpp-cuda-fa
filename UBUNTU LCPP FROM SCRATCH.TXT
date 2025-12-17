@@ -1,0 +1,51 @@
+I'm writing the complete sequence of commands to install and run **lcpp (llama.cpp)** from scratch (built from source) on a fresh **Ubuntu 25.10** install. I need your help to *produce the exact command sequence*, but **I will be the one compiling the complete sequence of commands** — **do not** write the complete sequence, you're only allowed to write the specific sequence for each of the prompts.
+
+Respond to each of my prompts **strictly** like this (this is a initial prompt, so when I say "prompts" I mean the next ones, so make sense of it):
+
+1. **Analyze** my prompt so you know exactly what you'd need to search on the web (only official docs and developer forums). **Do not** perform any web searches yet (as this is the initial prompt).
+2. **Reply with every precise question** you need answered to produce the correct, exact command sequence for the specific request we're working on. These questions must be actionable and specific — I will answer them. **Do not** write any questions for now (as this is the initial prompt).
+3. After I give my answers, **analyze my responses** and then tell me everything so that I can make sure you understood correctly (go search the web if needed for each of the developments) then whenever I'm finally satisfied I'll be replying to you with a single string "[WRITE]" so that you can make a final web search (fact-check) to **write the complete, exact sequence of commands** I must execute to achieve flawless, bug-free execution of the specific request we're working on. We'll iterate until it works if required. When I'm satisfied I'll be continue with next step (next prompt).
+
+Have you understood everything correctly? May I share my first prompt?
+
+[ Instructions ]
+
+1. git clone https://github.com/HighlyHotGames
+
+
+
+
+
+
+[ Fresh install of Ubuntu 25.10 ]
+
+A)
+
+[ Update OS; Set optimal settings for OS, CPU, RAM, SWAP, SSD (nvme) -> Disable GUI -> Restart ]
+
+1. set -e && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && sudo apt update && sudo DEBIAN_FRONTEND=noninteractive apt full-upgrade -y && sudo apt autoremove -y && sudo apt update && sudo apt upgrade -y && sudo apt install software-properties-common -y && sudo add-apt-repository ppa:apt-fast/stable -y && sudo apt update && sudo apt upgrade -y && sudo apt-get install -y debconf-utils && echo "apt-fast apt-fast/aptmanager string apt" | sudo debconf-set-selections && echo "apt-fast apt-fast/maxdownloads string 11" | sudo debconf-set-selections && echo "apt-fast apt-fast/dlflag boolean true" | sudo debconf-set-selections && sudo apt install aria2 -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install apt-fast -y && sudo apt-fast install -y cpufrequtils && sudo apt-fast install -y intel-microcode linux-cpupower nvme-cli thermald smartmontools linux-tools-common linux-tools-$(uname -r) && sudo update-initramfs && for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo performance | sudo tee $cpu/cpufreq/scaling_governor; done && echo 'GOVERNOR="performance"' | sudo tee /etc/default/cpufrequtils && sudo systemctl enable cpufrequtils && sudo sysctl -w vm.nr_hugepages=6144 && echo "vm.nr_hugepages=6144" | sudo tee -a /etc/sysctl.conf && sudo sysctl -p && sudo sysctl -w vm.swappiness=10 && echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf && echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-swappiness.conf && sudo sysctl -p && sudo sysctl -w vm.overcommit_memory=1 && echo "vm.overcommit_memory=1" | sudo tee -a /etc/sysctl.conf && echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.d/99-swappiness.conf && sudo sysctl --system && sudo sysctl -p && sudo systemctl enable --now fstrim.timer && sudo fstrim -av && sudo systemctl disable cups.service sudo systemctl disable apport.service && sudo systemctl disable snapd.refresh.timer && sudo systemctl disable motd-news.timer && sudo cp /etc/fstab /etc/fstab.bak && sudo swapoff -a && sudo rm -f /swap.img && sudo fallocate -l 32G /swap.img && sudo chmod 600 /swap.img && sudo mkswap /swap.img && sudo swapon /swap.img && echo '/swap.img none swap sw 0 0' | sudo tee -a /etc/fstab && sudo sed -i.bak -e '/[[:space:]]\/[[:space:]]/s/defaults.*/defaults,noatime,errors=remount-ro 0 1/' /etc/fstab && sudo systemctl set-default multi-user.target && sudo DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" full-upgrade -yq && sudo cp /etc/default/grub /etc/default/grub.bak && sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="systemd.unit=multi-user.target text nomodeset \1"/' /etc/default/grub && echo mq-deadline | sudo tee /sys/block/nvme0n1/queue/scheduler && echo 'ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="mq-deadline"' | sudo tee /etc/udev/rules.d/60-nvme-scheduler.rules && sudo udevadm control --reload-rules && sudo udevadm trigger && sudo smartctl -a /dev/nvme0n1 && sudo nvme id-ctrl /dev/nvme0n1 && sudo nvme get-feature /dev/nvme0n1 -f 0x0c && sudo update-grub && sudo systemctl stop gdm3 && sudo shutdown -r now 
+
+
+B)
+
+[ Remove nvidia driver -> Restart -> Install latest nvidia driver and CUDA -> Restart -> Verify ]
+
+2. set -e && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && sudo apt remove --purge -y 'nvidia-*' 'libnvidia-*' && sudo apt clean -y && sudo apt autoclean && sudo apt autoremove -s -y && sudo autoremove -y && sudo shutdown -r now
+
+3. set -e && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb && sudo dpkg -i cuda-keyring_1.1-1_all.deb && sudo apt update && sudo apt-fast install cuda-drivers -y && sudo apt-fast install cuda-toolkit -y && echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc && echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc && sudo update-initramfs -u && sudo shutdown -r now
+
+4. nvidia-smi && nvcc --version
+
+
+C)
+
+[ Build and install Python 3.14.2 from scratch ]
+
+5. set -e && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && sudo apt update && sudo apt install -y build-essential wget curl make libssl-dev zlib1g-dev libffi-dev libbz2-dev libreadline-dev libsqlite3-dev libncursesw5-dev libgdbm-dev uuid-dev pkg-config && cd /tmp && PYV=$(wget -qO- https://www.python.org/ftp/python/ | grep -oE '3\.14\.[0-9]+/' | tr -d '/' | sort -V | tail -n 1) && [ -n "$PYV" ] && wget https://www.python.org/ftp/python/$PYV/Python-$PYV.tar.xz && tar -xf Python-$PYV.tar.xz && cd Python-$PYV && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && ./configure --prefix=/usr/local --enable-optimizations --with-lto --enable-shared --with-ensurepip=install && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && make -j$(nproc) CFLAGS="-O3 -march=native -mtune=native -pipe" LDFLAGS="-Wl,-O1" && sudo make altinstall && echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/python3.14.conf >/dev/null && sudo ldconfig && /usr/local/bin/python3.14 --version && cd ~ && sudo rm -rf /tmp/Python-$PYV*
+
+
+D)
+
+[ Build and create wheel for Flash Attention ]
+
+6. set -e && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && mkdir -p lcpp && cd lcpp && python3.14 -m venv fa-env && source fa-env/bin/activate && python --version && python -m pip install pip --upgrade && pip install wheel setuptools ninja ccache packaging --upgrade && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130 && sudo swapoff -a && sudo swapon -a && sudo sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' && TORCH_CUDA_ARCH_LIST="7.5" FLASH_ATTENTION_FORCE_BUILD=TRUE MAX_JOBS=2 NVCC_APPEND_FLAGS="--threads=2" python -m pip install . --no-build-isolation -v 2>&1 | tee ~/flash-build.log
