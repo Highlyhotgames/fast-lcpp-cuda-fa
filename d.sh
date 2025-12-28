@@ -14,7 +14,8 @@ hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-Coder-30B-A3B-
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-30B-A3B-GGUF Qwen3-30B-A3B-UD-Q3_K_XL.gguf
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-30B-A3B-GGUF Qwen3-30B-A3B-UD-Q3_K_XL.gguf
 echo 'Other great models'
-
+hf download --local-dir models/txt --max-workers 14 unsloth/LFM2-2.6B-Exp-GGUF LFM2-2.6B-Exp-UD-Q8_K_XL.gguf
+hf download --local-dir models/txt --max-workers 14 MaziyarPanahi/GLM-4.6V-Flash-GGUF GLM-4.6V-Flash.Q6_K.gguf
 echo 'Downloading vision models...'
 echo 'Qwen3 VL'
 hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-2B-Thinking-GGUF Qwen3-VL-2B-Thinking-UD-Q8_K_XL.gguf
