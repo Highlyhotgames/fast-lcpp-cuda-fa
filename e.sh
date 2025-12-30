@@ -10,8 +10,7 @@ hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-8B-GGUF Qwen3-
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-8B-128K-GGUF Qwen3-8B-128K-UD-Q4_K_XL.gguf && df -h /
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-14B-GGUF Qwen3-14B-UD-Q4_K_XL.gguf && df -h /
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-14B-128K-GGUF Qwen3-14B-128K-UD-Q4_K_XL.gguf && df -h /
-hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF Qwen3-30B-A3B-Instruct-UD-Q4_K_XL.gguf && df -h /
-hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-30B-A3B-GGUF Qwen3-30B-A3B-UD-Q3_K_XL.gguf && df -h /
+hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf && df -h /
 hf download --local-dir models/txt --max-workers 14 unsloth/Qwen3-30B-A3B-GGUF Qwen3-30B-A3B-UD-Q3_K_XL.gguf && df -h /
 echo 'Other great models'
 hf download --local-dir models/txt --max-workers 14 unsloth/LFM2-2.6B-Exp-GGUF LFM2-2.6B-Exp-UD-Q8_K_XL.gguf && df -h /
@@ -24,6 +23,6 @@ hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-4B-Instr
 hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-4B-Thinking-GGUF Qwen3-VL-4B-Thinking-UD-Q8_K_XL.gguf && df -h /
 hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-8B-Instruct-GGUF Qwen3-VL-8B-Instruct-UD-Q4_K_XL.gguf && df -h /
 hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-8B-Thinking-GGUF Qwen3-VL-8B-Thinking-UD-Q4_K_XL.gguf && df -h /
-hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-30B-A3B-Instruct-GGUF Qwen3-VL-8B-Instruct-UD-Q3_K_XL.gguf && df -h /
-hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-30B-A3B-Thinking-GGUF Qwen3-VL-8B-Thinking-UD-Q3_K_XL.gguf
+hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-30B-A3B-Instruct-GGUF Qwen3-VL-30B-A3B-Instruct-UD-Q3_K_XL.gguf && df -h /
+hf download --local-dir models/vision --max-workers 14 unsloth/Qwen3-VL-30B-A3B-Thinking-GGUF Qwen3-VL-30B-A3B-Thinking-UD-Q3_K_XL.gguf
 echo 'Finished! Free hdd space:' && df -h /
